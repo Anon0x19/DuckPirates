@@ -8,12 +8,14 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 
-
+/**
+ * Tests which are not tied to an individual class within the project (for example testing if files exist)
+ */
 @RunWith(MyGdxGameTest.class)
 public class UnitTest {
 
     /**
-     * @Throws AssertionError and raises what Asset isn't loaded
+     * Used to test if all files exist
      */
     @Test
     public void AssetsExists() {
@@ -78,9 +80,5 @@ public class UnitTest {
         assertTrue("This will pass if it has the GameOver loaded (gameOverScreen)", Gdx.files.internal("../core/assets/gameOverScreen/GameOver.png").exists());
     }
 
-    @Test
-    public void testGetTrue() {
-        assertTrue(PirateDucks.getTrue());
-    }
 
 }
