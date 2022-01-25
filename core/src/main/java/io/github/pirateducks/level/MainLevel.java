@@ -37,7 +37,7 @@ public class MainLevel extends LevelManager {
         // Sets the background music
         music = Gdx.audio.newMusic(Gdx.files.internal("Main_Theme.ogg"));
         music.setLooping(true);
-        music.setVolume(0.03f);
+        music.setVolume(0.15f);
         music.play();
 
         // Sets the ocean sounds
@@ -63,9 +63,9 @@ public class MainLevel extends LevelManager {
 
     }
 
-    private final Rectangle constantine = new Rectangle(25, 40, 200, 250);
+    private final Rectangle langwith = new Rectangle(25, 40, 200, 250);
     private final Rectangle goodricke = new Rectangle(470, 35, 160, 150);
-    private final Rectangle langwith = new Rectangle(310, 240, 250, 170);
+    private final Rectangle constantine = new Rectangle(310, 240, 250, 170);
 
     @Override
     public void update(float delta) {

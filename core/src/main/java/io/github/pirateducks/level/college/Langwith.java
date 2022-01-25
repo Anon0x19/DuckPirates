@@ -3,6 +3,7 @@ package io.github.pirateducks.level.college;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,9 +20,10 @@ public class Langwith extends College {
     private final OrthographicCamera camera;
     private final MainLevel mainLevel;
     private final Array<LangwithCannon> cannons = new Array<>();
-    public Music sfx_ocean;
     private boolean save = false;
     private float playerX, playerY = 0;
+    public Music sfx_ocean;
+    private Sound explode;
 
     public Langwith(MainLevel mainLevel, OrthographicCamera camera) {
         super(mainLevel);
@@ -35,6 +37,8 @@ public class Langwith extends College {
         sfx_ocean.setLooping(true);
         sfx_ocean.setVolume(0.005f);
         sfx_ocean.play();
+
+        explode = Gdx.audio.newSound(Gdx.files.internal("explode.mp3"));
     }
 
     /**
@@ -102,7 +106,7 @@ public class Langwith extends College {
 
                 for (LangwithCannon c : cannons) {
                     // Check what fired the cannonball to stop instant collision with itself
-                    if (collision.overlaps(c.getCollision())) {
+                    if (collision.overlaps(c.getCollision()) && c.getHealth() != 0) {
                         // despawning the cannonball and lowering the cannons health
                         c.setHealth(c.getHealth()-1);
                         ((CannonBall) object).collide();
@@ -119,6 +123,7 @@ public class Langwith extends College {
                     // despawning the cannonball and lowering the players health
                     getPlayer().setHealth(getPlayer().getHealth()-1);
                     object.dispose();
+                    explode.play(0.15f);
                 }
             }
         }

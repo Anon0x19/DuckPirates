@@ -30,6 +30,11 @@ public class LangwithCannon extends Cannon {
     public void update(float delta) {
         super.update(delta);
 
+        // if the cannon is about to be disposed but has not been so sound can play, skip update
+        if(disposeTimer >= 0){
+            return;
+        }
+
         if (startFiring) {
             // Every 5 cannonballs fired will swap the phase between a pattern and rotating randomly
             angle += rotationSpeed;
@@ -54,7 +59,7 @@ public class LangwithCannon extends Cannon {
         shotsFired++;
         langwith.spawnCannonball(x + width / 2, y, getAngle());
         long id = cannonFireSound.play();
-        cannonFireSound.setVolume(id, 0.01f);
+        cannonFireSound.setVolume(id, 0.15f);
     }
 
     /**
