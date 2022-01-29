@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 
 import io.github.pirateducks.PirateDucks;
@@ -46,17 +47,39 @@ public class ConstantineMemoryGame extends College {
     private int[] digitsToMemorise;
 
     private boolean inGame = false;
+    private boolean gameFinished = false;
     private boolean save = false;
+    private boolean win = false;
 
     private final Array<Sprite> buttons = new Array<>();
 
     private final Screen prevScreen;
 
+    private final MainLevel mainLevel;
+
     public ConstantineMemoryGame(MainLevel level, OrthographicCamera camera, Screen prevScreen) {
         super(level);
         this.camera = camera;
         this.prevScreen = prevScreen;
+        this.mainLevel = level;
 
+        /*
+         * Beach by MusicbyAden & Jurgance | https://soundcloud.com/musicbyaden
+         * https://soundcloud.com/jurgance
+         * Music promoted by https://www.free-stock-music.com
+         * Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
+         * https://creativecommons.org/licenses/by-nd/4.0/
+         */
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("memoryGame/beach.mp3"));
+        backgroundMusic.setLooping(true);
+
+        // Set music volume
+        backgroundMusic.play();
+        if (getMainClass().musicOn) {
+            backgroundMusic.setVolume(0.15f);
+        } else {
+            backgroundMusic.setVolume(0);
+        }
     }
 
     @Override
@@ -66,13 +89,13 @@ public class ConstantineMemoryGame extends College {
 
     @Override
     protected Texture getMapTexture() {
-        // Constantine map not yet created
         return new Texture("map_blurred.png");
     }
 
     @Override
     public void setup(OrthographicCamera camera) {
         inGame = false;
+        gameFinished = false;
 
         // Display game header
         headerTexture = new Texture("memoryGame/header.png");
@@ -122,18 +145,13 @@ public class ConstantineMemoryGame extends College {
         buttons.add(closeSprite);
         closeSprite.setAlpha(0);
 
-
-        //Beach by MusicbyAden & Jurgance | https://soundcloud.com/musicbyaden
-        //https://soundcloud.com/jurgance
-        //Music promoted by https://www.free-stock-music.com
-        //Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
-        //https://creativecommons.org/licenses/by-nd/4.0/
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("memoryGame/beach.mp3"));
-        backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.15f);
+        // Change music volume
         backgroundMusic.play();
-
-
+        if (getMainClass().musicOn) {
+            backgroundMusic.setVolume(0.15f);
+        } else {
+            backgroundMusic.setVolume(0);
+        }
     }
 
 
@@ -150,11 +168,12 @@ public class ConstantineMemoryGame extends College {
                 cardTextures.get(x).dispose();
             }
         }
+        backgroundMusic.setVolume(0);
     }
 
     @Override
     public void draw(SpriteBatch batch, OrthographicCamera camera) {
-
+        ScreenUtils.clear(0, 0, 0.2f, 1);
         // set background as blurred map
         backgroundTexture = new Texture("map_blurred.png");
         backgroundSprite = new Sprite(backgroundTexture);
@@ -218,7 +237,7 @@ public class ConstantineMemoryGame extends College {
                 countdown.cancel();
                 numSeconds = countdownLength;
                 inGame = false;
-                setHealth(0);
+                gameFinished = true;
 
                 // Delay asking user for digits, as we need to make sure cards are hidden first.
                 ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -251,11 +270,16 @@ public class ConstantineMemoryGame extends College {
         }
         String correctDigits = builder.toString();
 
+        // creating a never displayed jframe so we get more control over jOptionPanes
         JFrame frame = new JFrame();
+        // ensuring all jOptionPanes stay on the top layer
+        frame.setAlwaysOnTop(true);
+        // centering the jframe
+        frame.setLocationRelativeTo(null);
 
-        String digits = JOptionPane.showInputDialog("Enter the digits you have memorised:");
+        String digits = JOptionPane.showInputDialog(frame, "Enter the digits you have memorised:");
 
-        Boolean win = false;
+        win = false;
 
         if (digits != null && digits.equals(correctDigits)) {
             // https://mixkit.co/free-sound-effects/win/
@@ -266,14 +290,12 @@ public class ConstantineMemoryGame extends College {
             win = true;
             winSound.dispose();
 
-            // Code to process correct input here
-
         } else {
             // https://mixkit.co/free-sound-effects/lose/
             Sound loseSound = Gdx.audio.newSound(Gdx.files.internal("memoryGame/lose.wav"));
             loseSound.play();
 
-            getPlayer().setHealth(getPlayer().getHealth() - 1);
+            mainLevel.getPlayer().setHealth(getPlayer().getHealth() - 2);
 
             String resultMsg = "Incorrect!";
             if (digits.isEmpty()) {
@@ -284,8 +306,6 @@ public class ConstantineMemoryGame extends College {
             JOptionPane.showMessageDialog(frame, resultMsg);
             win = false;
             loseSound.dispose();
-
-            // Code to process incorrect input here
         }
 
 
@@ -310,6 +330,10 @@ public class ConstantineMemoryGame extends College {
         // updating all game objects
         super.update(delta);
 
+        if (gameFinished && win) {
+            setHealth(0);
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && inGame == false) {
             save = true;
             this.stopDisplaying();
@@ -319,8 +343,6 @@ public class ConstantineMemoryGame extends College {
         // Check if buttons clicked
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             for (int i = 0; i < buttons.size; i++) {
-                int mouseX = Gdx.graphics.getWidth() - Gdx.input.getX();
-                int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
                 Vector2 scaledMouse = PirateDucks.getScaledMouseLocation(getMainClass().getCamera());
 
@@ -332,29 +354,36 @@ public class ConstantineMemoryGame extends College {
                 // Start game button clicked, so start the game
                 if (scaledMouse.x >= buttonX && scaledMouse.x <= (buttonX + buttonW) && scaledMouse.y >= buttonY && scaledMouse.y <= (buttonY + buttonH) && inGame == false) {
 
+                    if (gameFinished && win) {
+                        System.out.println("here");
+                        setHealth(0);
+                    } else if (i ==0 && !gameFinished) {
+                        //Start game button pressed
 
-                    //Start game button pressed
+                        Sound start = Gdx.audio.newSound(Gdx.files.internal("memoryGame/go.wav"));
+                        start.play();
 
-                    Sound start = Gdx.audio.newSound(Gdx.files.internal("memoryGame/go.wav"));
-                    start.play();
+                        // Hide start game button whilst game is running
+                        startGameSprite.setAlpha(0);
+                        //closeSprite.setAlpha(0);
 
-                    // Hide start game button whilst game is running
-                    startGameSprite.setAlpha(0);
+                        inGame = true;
+                        digitsToMemorise = new int[8];
+                        Random rand = new Random();
+                        for (int x = 0; x < 8; x++) {
+                            // Min value 0, max value 9
+                            digitsToMemorise[x] = rand.nextInt(10);
 
-                    inGame = true;
-                    digitsToMemorise = new int[8];
-                    Random rand = new Random();
-                    for (int x = 0; x < 8; x++) {
-                        // Min value 0, max value 9
-                        digitsToMemorise[x] = rand.nextInt(10);
+                            String filepath = "memoryGame/card-" + digitsToMemorise[x] + ".png";
+                            cardTextures.set(x, new Texture(filepath));
+                            cardSprites.get(x).setTexture(cardTextures.get(x));
 
-                        String filepath = "memoryGame/card-" + digitsToMemorise[x] + ".png";
-                        cardTextures.set(x, new Texture(filepath));
-                        cardSprites.get(x).setTexture(cardTextures.get(x));
-
+                        }
+                        Timer.schedule(countdown, 1f, 1f);
+                    } else if (i== 1){
+                        this.stopDisplaying();
+                        getLevelManager().getMainClass().setCurrentScreen(mainLevel);
                     }
-                    Timer.schedule(countdown, 1f, 1f);
-
                 }
             }
         }

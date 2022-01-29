@@ -12,12 +12,14 @@ import io.github.pirateducks.PirateDucks;
 import io.github.pirateducks.level.college.ConstantineMemoryGame;
 import io.github.pirateducks.level.college.Goodricke;
 import io.github.pirateducks.level.college.Langwith;
+import io.github.pirateducks.screen.GameCompleteScreen;
+import io.github.pirateducks.screen.PauseScreen;
 
 public class MainLevel extends LevelManager {
 
     public Music music;
     public Music sfx_ocean;
-    public boolean constantineDefeated = false, langwithDefeated = false, goodrikeDefeated = false;
+    public boolean constantineDefeated = false, langwithDefeated = false, goodrickeDefeated = false;
 
     public MainLevel(PirateDucks mainClass) {
         super(mainClass);
@@ -38,7 +40,11 @@ public class MainLevel extends LevelManager {
         // Sets the background music
         music = Gdx.audio.newMusic(Gdx.files.internal("Main_Theme.ogg"));
         music.setLooping(true);
-        music.setVolume(0.15f);
+        if (getMainClass().musicOn) {
+            music.setVolume(0.15f);
+        } else {
+            music.setVolume(0);
+        }
         music.play();
 
         // Sets the ocean sounds
@@ -56,7 +62,7 @@ public class MainLevel extends LevelManager {
 
         if (playerCollision.overlaps(constantine) && !constantineDefeated) {
             font.draw(batch, "Press \"E\" to fight Constantine College", 250, camera.viewportHeight - 10);
-        } else if (playerCollision.overlaps(goodricke) && !goodrikeDefeated) {
+        } else if (playerCollision.overlaps(goodricke) && !goodrickeDefeated) {
             font.draw(batch, "Press \"E\" to fight Goodricke College", 250, camera.viewportHeight - 10);
         } else if (playerCollision.overlaps(langwith) && !langwithDefeated) {
             font.draw(batch, "Press \"E\" to fight Langwith College", 250, camera.viewportHeight - 10);
@@ -77,11 +83,21 @@ public class MainLevel extends LevelManager {
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             if (playerCollision.overlaps(constantine) && !constantineDefeated) {
                 getMainClass().setCurrentScreen(new ConstantineMemoryGame(this, getCamera(), this));
-            } else if (playerCollision.overlaps(goodricke) && !goodrikeDefeated) {
+            } else if (playerCollision.overlaps(goodricke) && !goodrickeDefeated) {
                 getMainClass().setCurrentScreen(new Goodricke(this, getCamera()));
             } else if (playerCollision.overlaps(langwith) && !langwithDefeated) {
                 getMainClass().setCurrentScreen(new Langwith(this, getCamera()));
             }
+        }
+
+        if (goodrickeDefeated && constantineDefeated && langwithDefeated){
+          getMainClass().setCurrentScreen(new GameCompleteScreen(getMainClass(),getCamera()));
+        }
+        // Pause game when escape key is pressed
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+            this.stopDisplaying();
+            // Load pause screen
+            getMainClass().setCurrentScreen(new PauseScreen(getMainClass(),this));
         }
     }
 
@@ -99,12 +115,12 @@ public class MainLevel extends LevelManager {
         return constantineDefeated;
     }
 
-    public void setGoodrikeDefeated(boolean goodrikeDefeated) {
-        this.goodrikeDefeated = goodrikeDefeated;
+    public void setGoodrickeDefeated(boolean goodrickeDefeated) {
+        this.goodrickeDefeated = goodrickeDefeated;
     }
 
-    public boolean isGoodrikeDefeated() {
-        return goodrikeDefeated;
+    public boolean isGoodrickeDefeated() {
+        return goodrickeDefeated;
     }
 
     public void setLangwithDefeated(boolean langwithDefeated) {
@@ -114,4 +130,5 @@ public class MainLevel extends LevelManager {
     public boolean isLangwithDefeated() {
         return langwithDefeated;
     }
+
 }
