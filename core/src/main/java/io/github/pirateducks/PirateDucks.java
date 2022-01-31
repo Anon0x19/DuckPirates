@@ -22,16 +22,17 @@ public class PirateDucks extends ApplicationAdapter {
         return new Vector2(point.x * (camera.viewportWidth / Gdx.graphics.getWidth()), point.y * (camera.viewportHeight / Gdx.graphics.getHeight()));
     }
 
-	/**
-	 * Used to get the in game coordinates of the mouse
-	 * @param camera The camera that is in charge of scaling
-	 * @return The location of the mouse pointer in in-game coordinates
-	 */
-	public static Vector2 getScaledMouseLocation(OrthographicCamera camera){
-		int mouseX = Gdx.input.getX();
-		int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
-		return getScaledLocation(new Vector2(mouseX, mouseY), camera);
-	}
+    /**
+     * Used to get the in game coordinates of the mouse
+     *
+     * @param camera The camera that is in charge of scaling
+     * @return The location of the mouse pointer in in-game coordinates
+     */
+    public static Vector2 getScaledMouseLocation(OrthographicCamera camera) {
+        int mouseX = Gdx.input.getX();
+        int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+        return getScaledLocation(new Vector2(mouseX, mouseY), camera);
+    }
 
     private Screen currentScreen;
 
@@ -46,6 +47,7 @@ public class PirateDucks extends ApplicationAdapter {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 848, 480);
         camera.update();
+
         viewport = new FitViewport(848, 480);
         batch = new SpriteBatch();
 
@@ -82,11 +84,21 @@ public class PirateDucks extends ApplicationAdapter {
      * @param screen The screen to display
      */
     public void setCurrentScreen(Screen screen) {
+        setCurrentScreen(screen, true);
+    }
+
+    public void setCurrentScreen(Screen screen, boolean setup) {
         if (currentScreen != null) {
             currentScreen.stopDisplaying();
         }
+        // resetting the camera position
+        camera.position.x = camera.viewportWidth / 2;
+        camera.position.y = camera.viewportHeight / 2;
+
         currentScreen = screen;
-        currentScreen.startDisplaying(camera);
+        if (setup) {
+            currentScreen.startDisplaying(camera);
+        }
     }
 
     /**
