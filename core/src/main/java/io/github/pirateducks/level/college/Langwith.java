@@ -15,12 +15,16 @@ import io.github.pirateducks.level.MainLevel;
 import io.github.pirateducks.level.gameObjects.*;
 import io.github.pirateducks.screen.PauseScreen;
 
-
+/**
+ * This class is the Langwith college fight
+ */
 public class Langwith extends College {
+
+    // initialize array storing cannons
+    private final Array<LangwithCannon> cannons = new Array<>();
 
     private final OrthographicCamera camera;
     private final MainLevel mainLevel;
-    private final Array<LangwithCannon> cannons = new Array<>();
     private boolean save, tutorialCompleted = false;
     private float playerX, playerY = 0;
     public Music sfx_ocean;
@@ -29,11 +33,17 @@ public class Langwith extends College {
     private Texture tutorialTexture;
     private Sprite tutorial;
 
-    public Langwith(MainLevel mainLevel, OrthographicCamera camera) {
-        super(mainLevel);
-        this.mainLevel = mainLevel;
+    /**
+     * Class constructor, called to start the Langwith college Game
+     * @param level MainLevel class which holds the main game and player data
+     * @param camera Manages screen of the game
+     */
+    public Langwith(MainLevel level, OrthographicCamera camera) {
+        super(level);
+        this.mainLevel = level;
         this.camera = camera;
 
+        // 1 health for each cannon
         setHealth(4);
 
         // load and loops ocean sounds
@@ -67,6 +77,7 @@ public class Langwith extends College {
 
         explode = Gdx.audio.newSound(Gdx.files.internal("explode.mp3"));
 
+        // load the tutorial screens
         tutorialTexture = new Texture("langwith/langwithTutorial.png");
         tutorial = new Sprite(tutorialTexture);
     }
@@ -149,6 +160,14 @@ public class Langwith extends College {
             save = false;
         }
 
+        for (GameObject object : cannons) {
+            object.update(delta);
+        }
+
+        for (Coin c : getCoins()) {
+            c.update(delta);
+        }
+
         // Loop through objects and check for collision
         for (GameObject object : getObjectsClone()) {
             if (object instanceof CannonBall) {
@@ -161,6 +180,7 @@ public class Langwith extends College {
                         // despawning the cannonball and lowering the cannons health
                         c.setHealth(c.getHealth()-1);
                         ((CannonBall) object).collide();
+                        getMainClass().addGold(100);
                     }
                 }
             }
@@ -178,19 +198,15 @@ public class Langwith extends College {
                 }
             }
         }
-        for (GameObject object : cannons) {
-            object.update(delta);
-        }
 
-        for (Coin c : getCoins()) {
-            c.update(delta);
-        }
         // check if the player has hit any coins
         Rectangle collision = getPlayer().getCollision();
         for (Coin c : getCoinsClone()) {
             if (c.getCollision().overlaps(collision)) {
                 // Collect the coins
                 c.collect();
+                // Add 10 points to the count for each coin collected multiplied by size
+                getMainClass().addGold(c.getSize() * 10);
             }
         }
     }
@@ -206,11 +222,23 @@ public class Langwith extends College {
             for (GameObject object : cannons) {
                 object.dispose();
             }
+            for (Coin c : getCoins()) {
+                c.dispose();
+            }
             sfx_ocean.dispose();
             gameMusic.dispose();
         }
         gameMusic.setVolume(0);
         sfx_ocean.setVolume(0);
+    }
+
+    @Override
+    public void resume() {
+        if (getMainClass().musicOn) {
+            gameMusic.setVolume(0.15f);
+        } else {
+            gameMusic.setVolume(0);
+        }
     }
 
     /**
@@ -270,5 +298,4 @@ public class Langwith extends College {
             gameMusic.setVolume(0);
         }
     }
-
 }

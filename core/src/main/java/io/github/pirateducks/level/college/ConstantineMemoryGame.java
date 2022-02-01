@@ -9,22 +9,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
-
 import io.github.pirateducks.PirateDucks;
 import io.github.pirateducks.level.MainLevel;
 import io.github.pirateducks.screen.PauseScreen;
-import io.github.pirateducks.screen.Screen;
-
 import javax.swing.*;
-
 import java.util.Random;
 import java.util.concurrent.*;
 
-
+/**
+ * This class is the Constantine memory game
+ */
 public class ConstantineMemoryGame extends College{
 
     private final OrthographicCamera camera;
@@ -210,6 +207,15 @@ public class ConstantineMemoryGame extends College{
         backgroundMusic.setVolume(0);
     }
 
+    @Override
+    public void resume() {
+        if (getMainClass().musicOn) {
+            backgroundMusic.setVolume(0.15f);
+        } else {
+            backgroundMusic.setVolume(0);
+        }
+    }
+
     /**
      * Draw all graphics
      * @param batch The batch that is rendering the level
@@ -382,8 +388,6 @@ public class ConstantineMemoryGame extends College{
         closeSprite.setAlpha(1);
 
         return win;
-
-
     }
 
     /**

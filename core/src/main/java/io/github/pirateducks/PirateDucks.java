@@ -9,6 +9,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.pirateducks.screen.*;
 
+/**
+ * Main class for setting up the game
+ */
 public class PirateDucks extends ApplicationAdapter {
 
     /**
@@ -40,8 +43,13 @@ public class PirateDucks extends ApplicationAdapter {
     private OrthographicCamera camera;
     private Viewport viewport;
     public Boolean musicOn = true;
-    public int points = 0;
+    private int playerHealth = 6;
+    private int points = 0;
+    private int gold = 0;
 
+    /**
+     * Setup the game by creating a camera and creating new instance of main menu
+     */
     @Override
     public void create() {
         camera = new OrthographicCamera();
@@ -55,6 +63,9 @@ public class PirateDucks extends ApplicationAdapter {
         setCurrentScreen(new MainMenuScreen(this));
     }
 
+    /**
+     * Render current screen
+     */
     @Override
     public void render() {
         camera.update();
@@ -66,6 +77,9 @@ public class PirateDucks extends ApplicationAdapter {
         currentScreen.update(Gdx.graphics.getDeltaTime());
     }
 
+    /**
+     * Dispose of resources as no longer being displayed
+     */
     @Override
     public void dispose() {
         batch.dispose();
@@ -73,6 +87,11 @@ public class PirateDucks extends ApplicationAdapter {
         currentScreen.stopDisplaying();
     }
 
+    /**
+     * Resize the screen
+     * @param width New width of the screen
+     * @param height New height of the screen
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -87,6 +106,11 @@ public class PirateDucks extends ApplicationAdapter {
         setCurrentScreen(screen, true);
     }
 
+    /**
+     * Change which screen is currently being displayed
+     * @param screen The new screen to display
+     * @param setup Value of whether the screen is being resumed (false) rather than starting brand new (true)
+     */
     public void setCurrentScreen(Screen screen, boolean setup) {
         if (currentScreen != null) {
             currentScreen.stopDisplaying();
@@ -98,17 +122,45 @@ public class PirateDucks extends ApplicationAdapter {
         currentScreen = screen;
         if (setup) {
             currentScreen.startDisplaying(camera);
+        } else{
+            currentScreen.resume();
         }
     }
 
-    /**
-     * Used to get which screen is currently being displayed
-     */
+
     public Screen getCurrentScreen() {
         return currentScreen;
     }
 
     public OrthographicCamera getCamera() {
         return camera;
+    }
+
+    public int getPlayerHealth() { return playerHealth; }
+
+    public void setPlayerHealth(int newHealth) { playerHealth = newHealth; }
+
+    public int getPoints () {
+        return points;
+    }
+
+    public void setPoints (int n) {
+        this.points = n;
+    }
+
+    public void addPoints (int n) {
+        this.points += n;
+    }
+
+    public int getGold () {
+        return gold;
+    }
+
+    public void setGold (int n) {
+        this.gold = n;
+    }
+
+    public void addGold (int n) {
+        this.gold += n;
     }
 }

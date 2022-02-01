@@ -11,6 +11,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.pirateducks.PirateDucks;
 
+/**
+ * This screen is displayed when all three colleges are defeated and the player has won
+ */
 public class GameCompleteScreen implements Screen{
 
     // Initialise Textures and Sprites for graphics
@@ -39,7 +42,6 @@ public class GameCompleteScreen implements Screen{
 
     /**
      * Called to draw the screen and display graphics
-     *
      * @param batch Used to draw sprites
      */
     @Override
@@ -64,14 +66,13 @@ public class GameCompleteScreen implements Screen{
         // Generate and draw text which displays number of points user obtained
         BitmapFont font = new BitmapFont();
         font.getData().setScale(1.5f);
-        String points = "You scored " + mainClass.points + " points!";
+        String points = "You scored " + mainClass.getPoints() + " points!";
         font.draw(batch,points,(camera.viewportWidth/2 - font.getRegion().getRegionWidth() / 2) + 25,camera.viewportHeight/2);
 
     }
 
     /**
      * Called to update the screen and check if buttons are pressed
-     *
      * @param delta The delta time since the last update
      */
     @Override
@@ -135,5 +136,10 @@ public class GameCompleteScreen implements Screen{
         backgroundTexture.dispose();
         headerTexture.dispose();
         menuButtonTexture.dispose();
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do here
     }
 }

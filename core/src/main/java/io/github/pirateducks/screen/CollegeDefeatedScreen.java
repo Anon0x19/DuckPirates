@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,10 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.pirateducks.PirateDucks;
 import io.github.pirateducks.level.MainLevel;
 
+/**
+ * This screen is displayed when the player has defeated a college
+ * It displays the message that the college has been defeated and offers a return to menu button
+ */
 public class CollegeDefeatedScreen implements Screen {
 
     private final Array<Sprite> buttons = new Array<>();
@@ -19,15 +24,22 @@ public class CollegeDefeatedScreen implements Screen {
 
     private final OrthographicCamera camera;
     private final MainLevel mainLevel;
+    BitmapFont font;
 
+    /**
+     * class constructor, called when this screen is displayed
+     * @param mainLevel
+     * @param camera
+     */
     public CollegeDefeatedScreen(MainLevel mainLevel, OrthographicCamera camera){
         this.camera = camera;
         this.mainLevel = mainLevel;
+
+        this.font = new BitmapFont();
     }
 
     /**
      * Called to draw the screen
-     *
      * @param batch
      */
     @Override
@@ -42,15 +54,19 @@ public class CollegeDefeatedScreen implements Screen {
                 button.draw(batch);
             }
         }
+
+        font.draw(batch, "+1,000 points. Extra heart gained!", camera.viewportWidth/2 - 100, camera.viewportHeight/2 + 30);
     }
 
+    /**
+     * Called to update screen when user input is detected
+     * @param delta The delta time since the last update
+     */
     @Override
     public void update(float delta) {
         // If user left-clicks the screen
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
         {
-            // Stops multiple buttons being pressed in the loop
-            boolean buttonPressed = false;
             // Loop through all buttons and see if one was clicked
             for (int i = 0; i < buttons.size; i++) {
                 Sprite button = buttons.get(i);
@@ -64,8 +80,8 @@ public class CollegeDefeatedScreen implements Screen {
                         scaledInput.y >= button.getY() && scaledInput.y <= button.getY() + button.getHeight())
                 {
                     if (i == 0) {
-                        mainLevel.getMainClass().setCurrentScreen(mainLevel);
-                        buttonPressed = true;
+                        mainLevel.getMainClass().setCurrentScreen(mainLevel, false);
+
                     }
                 }
             }
@@ -79,7 +95,7 @@ public class CollegeDefeatedScreen implements Screen {
     public void startDisplaying(OrthographicCamera camera) {
 
         // Creates a sprite with the Game over title texture
-        Texture texture = new Texture("CollegeDefeatedScreen.png");
+        Texture texture = new Texture("collegeWin/CollegeDefeatedScreen.png");
         gameOverSprite = new Sprite(texture);
 
         // scales the sprite depending on window size multiplied by a constant
@@ -92,9 +108,13 @@ public class CollegeDefeatedScreen implements Screen {
         addButtons(camera);
     }
 
+    /**
+     * Called to add return to menu button
+     * @param camera
+     */
     private void addButtons(OrthographicCamera camera) {
         // Add a return to menu button
-        Texture texture = new Texture("gameOverScreen/buttons/GameOverMenuButton.png");
+        Texture texture = new Texture("collegeWin/Continue.png");
         // Create sprite from texture
         Sprite button = new Sprite(texture);
         // scales the sprite based on window size multiplied by a constant since textures will be different size images
@@ -114,5 +134,10 @@ public class CollegeDefeatedScreen implements Screen {
     @Override
     public void stopDisplaying() {
         buttons.clear();
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do here
     }
 }

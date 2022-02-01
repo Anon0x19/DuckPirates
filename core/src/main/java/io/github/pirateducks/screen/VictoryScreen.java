@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.pirateducks.PirateDucks;
 
-
 public class VictoryScreen implements Screen {
 
     private final Array<Sprite> buttons = new Array<>();
@@ -99,6 +98,10 @@ public class VictoryScreen implements Screen {
         addButtons(camera);
     }
 
+    /**
+     * Called to add return to menu button and quit button to screen
+     * @param camera
+     */
     private void addButtons(OrthographicCamera camera) {
         // Add a return to menu button
         Texture texture = new Texture("victoryScreen/buttons/VictoryScreenMenuButton.png");
@@ -129,5 +132,10 @@ public class VictoryScreen implements Screen {
     @Override
     public void stopDisplaying() {
         buttons.clear();
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do here
     }
 }

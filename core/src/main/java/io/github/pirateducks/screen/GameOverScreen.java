@@ -11,7 +11,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.pirateducks.PirateDucks;
 
-
+/**
+ * This screen is called when the player has been defeated a college,
+ * it contains a return to menu button and a quit button
+ */
 public class GameOverScreen implements Screen {
 
     private final Array<Sprite> buttons = new Array<>();
@@ -66,11 +69,13 @@ public class GameOverScreen implements Screen {
                 if (scaledMouse.x >= button.getX() && scaledMouse.x <= button.getX() + button.getWidth() &&
                         scaledMouse.y >= button.getY() && scaledMouse.y <= button.getY() + button.getHeight()) {
                     if (i == 0) {
-                        mainClass.points = 0;
+                        mainClass.setPoints(0);
+                        mainClass.setGold(0);
                         mainClass.setCurrentScreen(new MainMenuScreen(mainClass));
                         buttonPressed = true;
                     } else if (i == 1 && !buttonPressed) {
-                        mainClass.points = 0;
+                        mainClass.setPoints(0);
+                        mainClass.setGold(0);
                         // Exit the application
                         Gdx.app.exit();
                         System.exit(0);
@@ -99,6 +104,10 @@ public class GameOverScreen implements Screen {
         addButtons(camera);
     }
 
+    /**
+     * Called to add buttons to allow user input
+     * @param camera
+     */
     private void addButtons(OrthographicCamera camera) {
         // Add a return to menu button
         Texture texture = new Texture("gameOverScreen/buttons/GameOverMenuButton.png");
@@ -129,5 +138,10 @@ public class GameOverScreen implements Screen {
     @Override
     public void stopDisplaying() {
         buttons.clear();
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do here
     }
 }

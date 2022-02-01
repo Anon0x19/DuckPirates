@@ -19,11 +19,16 @@ import io.github.pirateducks.level.gameObjects.GoodrickeCannon;
 import io.github.pirateducks.screen.PauseScreen;
 import java.util.Random;
 
+/**
+ * This class is the Goodricke college fight
+ */
 public class Goodricke extends College { // Projectiles
-    private final OrthographicCamera camera;
+
+    // initialize object arrays
     private final Array<Fruit> fruit = new Array<>();
     private final Array<GoodrickeCannon> cannons = new Array<>();
 
+    private final OrthographicCamera camera;
     private float fruitSize = 10; // Size of fruit
     private final float sizeMultiplier = (float) 1;
     private float playerX = 0; // Default player co-ordinates
@@ -34,7 +39,14 @@ public class Goodricke extends College { // Projectiles
     public Sound explode;
     private Texture tutorialTexture;
     private Sprite tutorial;
+    private int temp_gold = 0; // Local Gold, Resets each time Goodricke is run
 
+
+    /**
+     * Class constructor, called to start the Goodricke college Game
+     * @param level MainLevel class which holds the main game and player data
+     * @param camera Manages screen of the game
+     */
     public Goodricke(MainLevel level, OrthographicCamera camera) {
         super(level);
 
@@ -68,6 +80,7 @@ public class Goodricke extends College { // Projectiles
          */
         explode = Gdx.audio.newSound(Gdx.files.internal("goodricke/fruit-destroy.mp3"));
 
+        // load the tutorial screens
         tutorialTexture = new Texture("goodricke/goodrickeTutorial.png");
         tutorial = new Sprite(tutorialTexture);
     }
@@ -135,13 +148,6 @@ public class Goodricke extends College { // Projectiles
             return;
         }
 
-        for(GoodrickeCannon cannon : cannons) {
-            cannon.update(delta);
-        }
-        for (Fruit f : fruit) {
-            f.update(delta);
-        }
-
         if (cannons.isEmpty()) {
             // all cannons are dead, the college has been defeated setting its health to 0
             setHealth(0);
@@ -150,6 +156,13 @@ public class Goodricke extends College { // Projectiles
         // Return to main level if college is defeated
         if (isDefeated()) {
             save = false;
+        }
+
+        for(GoodrickeCannon cannon : cannons) {
+            cannon.update(delta);
+        }
+        for (Fruit f : fruit) {
+            f.update(delta);
         }
 
         // checking if any cannonballs are hitting any fruit or cannons
@@ -174,6 +187,7 @@ public class Goodricke extends College { // Projectiles
                     if(cannon.getHealth() > 0 && collision.overlaps(cannon.getCollision())){
                         cannon.setHealth(cannon.getHealth() - 2);
                         ((CannonBall)object).collide();
+                        getMainClass().addGold(100);
                         continue;
                         // no need to check other cannons
                     }
@@ -201,6 +215,8 @@ public class Goodricke extends College { // Projectiles
             if (c.getCollision().overlaps(collision)) {
                 // Collect the coins
                 c.collect();
+                // Add 10 points to the count for each coin collected multiplied by size
+                getMainClass().addGold(c.getSize() * 10);
             }
         }
     }
@@ -221,6 +237,7 @@ public class Goodricke extends College { // Projectiles
 
     @Override
     public void setup(OrthographicCamera camera) {
+
         // Don't add new cannons when unpausing
         if (!save) {
             // init the cannons
@@ -254,10 +271,22 @@ public class Goodricke extends College { // Projectiles
             for (GoodrickeCannon cannon : cannons) {
                 cannon.dispose();
             }
+            for (Coin c : getCoins()) {
+                c.dispose();
+            }
             gameMusic.dispose();
         }
         gameMusic.setVolume(0);
         sfx_ocean.dispose();
+    }
+
+    @Override
+    public void resume() {
+        if (getMainClass().musicOn) {
+            gameMusic.setVolume(0.15f);
+        } else {
+            gameMusic.setVolume(0);
+        }
     }
 
     public void removeCannon(GoodrickeCannon cannon) {
