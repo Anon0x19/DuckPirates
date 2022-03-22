@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import io.github.pirateducks.screen.*;
+import io.github.pirateducks.screen.MainMenuScreen;
+import io.github.pirateducks.screen.Screen;
 
 /**
  * Main class for setting up the game
@@ -115,9 +116,11 @@ public class PirateDucks extends ApplicationAdapter {
         if (currentScreen != null) {
             currentScreen.stopDisplaying();
         }
+
         // resetting the camera position
         camera.position.x = camera.viewportWidth / 2;
         camera.position.y = camera.viewportHeight / 2;
+
 
         currentScreen = screen;
         if (setup) {
@@ -125,6 +128,7 @@ public class PirateDucks extends ApplicationAdapter {
         } else{
             currentScreen.resume();
         }
+
     }
 
 

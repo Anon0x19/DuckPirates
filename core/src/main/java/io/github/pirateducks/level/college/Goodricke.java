@@ -13,10 +13,11 @@ import com.badlogic.gdx.utils.Array;
 import io.github.pirateducks.level.GameObject;
 import io.github.pirateducks.level.MainLevel;
 import io.github.pirateducks.level.gameObjects.CannonBall;
-import io.github.pirateducks.level.gameObjects.Fruit;
 import io.github.pirateducks.level.gameObjects.Coin;
+import io.github.pirateducks.level.gameObjects.Fruit;
 import io.github.pirateducks.level.gameObjects.GoodrickeCannon;
 import io.github.pirateducks.screen.PauseScreen;
+
 import java.util.Random;
 
 /**
@@ -104,13 +105,14 @@ public class Goodricke extends College { // Projectiles
             cannon.render(batch);
         }
 
+        /*for (Coin c : getCoins()) {
+            c.render(batch);
+        }*/
+
         for (Fruit f : fruit) {
             f.render(batch);
         }
 
-        for (Coin c : getCoins()) {
-            c.render(batch);
-        }
 
         // Show tutorial if player just loaded the college
         if (!tutorialCompleted) {

@@ -14,7 +14,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 import io.github.pirateducks.PirateDucks;
 import io.github.pirateducks.level.MainLevel;
+import io.github.pirateducks.screen.GameOverScreen;
 import io.github.pirateducks.screen.PauseScreen;
+
 import javax.swing.*;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -194,17 +196,17 @@ public class ConstantineMemoryGame extends College{
     @Override
     public void stopDisplaying() {
 
+        backgroundMusic.setVolume(0);
+
         if (!save) {
             backgroundTexture.dispose();
             startGameTexture.dispose();
             closeTexture.dispose();
             backgroundMusic.dispose();
-
             for (int x = 0; x < 8; x++) {
                 cardTextures.get(x).dispose();
             }
         }
-        backgroundMusic.setVolume(0);
     }
 
     @Override
@@ -257,6 +259,8 @@ public class ConstantineMemoryGame extends College{
     // Set length of timer of game (in seconds)
     private final int countdownLength = 10;
 
+    private boolean gameOver = false;
+
     /**
      * Timer task which performs countdown
      * This task
@@ -308,6 +312,7 @@ public class ConstantineMemoryGame extends College{
                 };
                 // Schedule task to ask user for digits they have memorised in 500ms
                 Future<Boolean> result = scheduler.schedule(task, 500, TimeUnit.MILLISECONDS);
+
             }
         }
     };
@@ -368,10 +373,14 @@ public class ConstantineMemoryGame extends College{
             Sound loseSound = Gdx.audio.newSound(Gdx.files.internal("memoryGame/lose.wav"));
             loseSound.play();
 
-            mainLevel.getPlayer().setHealth(getPlayer().getHealth() - 2);
+            mainLevel.getPlayer().setHealth(mainLevel.getPlayer().getHealth() - 2, false);
+
+            if(mainLevel.getPlayer().getHealth() <= 0){
+                gameOver = true;
+            }
 
             String resultMsg;
-            if (digits.isEmpty()) {
+            if (digits == null || digits.isEmpty()) {
                 resultMsg = "Incorrect! You didn't enter anything. The correct answer was " + correctDigits + "! Lose a heart";
             } else {
                 resultMsg = "Incorrect! You entered " + digits + " but should have got " + correctDigits + "! Lose a heart";
@@ -402,6 +411,13 @@ public class ConstantineMemoryGame extends College{
         // Check if user has defeated the college
         if (gameFinished && win) {
             setHealth(0);
+            return;
+        }
+
+
+        if(gameOver){
+            getMainClass().setCurrentScreen(new GameOverScreen(getMainClass(), camera));
+            return;
         }
 
         // Check if escape key pressed to pause the game

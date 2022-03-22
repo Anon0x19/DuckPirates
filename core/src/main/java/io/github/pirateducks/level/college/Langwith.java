@@ -12,7 +12,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import io.github.pirateducks.level.GameObject;
 import io.github.pirateducks.level.MainLevel;
-import io.github.pirateducks.level.gameObjects.*;
+import io.github.pirateducks.level.gameObjects.CannonBall;
+import io.github.pirateducks.level.gameObjects.Coin;
+import io.github.pirateducks.level.gameObjects.LangwithCannon;
+import io.github.pirateducks.level.gameObjects.LangwithCannonball;
 import io.github.pirateducks.screen.PauseScreen;
 
 /**
@@ -78,7 +81,7 @@ public class Langwith extends College {
         explode = Gdx.audio.newSound(Gdx.files.internal("explode.mp3"));
 
         // load the tutorial screens
-        tutorialTexture = new Texture("langwith/langwithTutorial.png");
+        tutorialTexture = new Texture("Langwith/langwithTutorial.png");
         tutorial = new Sprite(tutorialTexture);
     }
 
@@ -103,10 +106,6 @@ public class Langwith extends College {
 
         for (GameObject object : cannons) {
             object.render(batch);
-        }
-
-        for (Coin c : getCoins()) {
-            c.render(batch);
         }
 
         // Show tutorial if player just loaded the college
